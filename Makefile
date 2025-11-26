@@ -32,13 +32,13 @@ clean:
 	rm -rf dist coverage node_modules
 
 docker-build:
-	docker-compose build
+	docker compose build
 
 docker-up:
-	docker-compose up -d
+	docker compose up -d
 
 docker-down:
-	docker-compose down
+	docker compose down
 
 docker-logs:
-	docker-compose logs -f
+	docker compose logs -f

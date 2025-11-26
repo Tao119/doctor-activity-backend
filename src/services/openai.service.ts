@@ -2,9 +2,16 @@ import OpenAI from 'openai';
 import { logger } from '../utils/logger';
 import { IPatientRecord } from '../models/PatientRecord';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+let openaiInstance: OpenAI | null = null;
+
+const getOpenAI = (): OpenAI => {
+    if (!openaiInstance) {
+        openaiInstance = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        });
+    }
+    return openaiInstance;
+};
 
 export interface GeneratedQuiz {
     title: string;
@@ -55,6 +62,7 @@ ${JSON.stringify(recordsSummary, null, 2)}
 - 説明は詳細で教育的な内容にしてください
 - 個人情報は含めないでください`;
 
+            const openai = getOpenAI();
             const response = await openai.chat.completions.create({
                 model: 'gpt-4-turbo-preview',
                 messages: [
@@ -101,6 +109,7 @@ ${JSON.stringify(recordsSummary, null, 2)}
 
 分析結果を200文字以内で提供してください。`;
 
+            const openai = getOpenAI();
             const response = await openai.chat.completions.create({
                 model: 'gpt-4-turbo-preview',
                 messages: [
