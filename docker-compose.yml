@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: doctor-activity-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: doctor-activity
+
+  backend:
+    build: .
+    container_name: doctor-activity-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/doctor-activity
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+
+volumes:
+  mongodb_data:

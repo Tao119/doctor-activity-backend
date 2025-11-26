@@ -1,0 +1,50 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.1.0
+
+jobs:
+  test:
+    docker:
+      - image: cimg/node:20.10
+      - image: mongo:7.0
+        environment:
+          MONGO_INITDB_DATABASE: doctor-activity-test
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run tests
+          command: npm test
+      - run:
+          name: Run linter
+          command: npm run lint
+      - store_test_results:
+          path: coverage
+      - store_artifacts:
+          path: coverage
+
+  build:
+    docker:
+      - image: cimg/node:20.10
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build TypeScript
+          command: npm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+workflows:
+  version: 2
+  test-and-build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
